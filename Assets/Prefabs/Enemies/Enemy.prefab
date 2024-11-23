@@ -12,10 +12,10 @@ GameObject:
   - component: {fileID: 6555716530921566680}
   - component: {fileID: 4370905018041034443}
   - component: {fileID: 4436517170435926023}
-  - component: {fileID: 2848014640518720700}
-  - component: {fileID: 6016047462826561587}
   - component: {fileID: -7261777810552827835}
   - component: {fileID: -2863772297083229648}
+  - component: {fileID: 2848014640518720700}
+  - component: {fileID: 6016047462826561587}
   m_Layer: 11
   m_Name: Enemy
   m_TagString: Enemy
@@ -109,34 +109,6 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &2848014640518720700
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8834230414387790470}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1f306c9d14fe6d64ea26798893399762, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  enemyHealth: 50
-  movementSpeed: 3
---- !u!114 &6016047462826561587
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8834230414387790470}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 27ca8f32fe8a844488779275c6c64612, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  targetUpdateInterval: 0.1
-  obstacleAvoidancePriority: 50
 --- !u!54 &-7261777810552827835
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -186,3 +158,30 @@ NavMeshAgent:
   m_BaseOffset: 0.5
   m_WalkableMask: 4294967295
   m_ObstacleAvoidanceType: 4
+--- !u!114 &2848014640518720700
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8834230414387790470}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1f306c9d14fe6d64ea26798893399762, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  config: {fileID: 11400000, guid: d4923d03db0c8154ea27b9faa79808fb, type: 2}
+--- !u!114 &6016047462826561587
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8834230414387790470}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 27ca8f32fe8a844488779275c6c64612, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  targetUpdateInterval: 0.1
+  obstacleAvoidancePriority: 50

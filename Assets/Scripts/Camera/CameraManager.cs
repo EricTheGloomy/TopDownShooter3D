@@ -1,26 +1,19 @@
-// Scripts/Camera/CameraManager.cs
 using UnityEngine;
 
 public class CameraManager : MonoBehaviour
 {
-    [SerializeField] private Transform playerTransform; // Reference to the player's transform
-    [SerializeField] private Vector3 offset = new Vector3(3, 12, -12); // Default offset
-    [SerializeField] private float rotationAngle = 45f; // Default angle for the camera
-    [SerializeField] private float followSpeed = 5f; // Speed at which the camera follows the player
+    [SerializeField] private CameraSettings cameraSettings; // Reference to the settings
+    [SerializeField] private Transform playerTransform;     // Player Transform (assigned at runtime)
 
-    private Transform cameraTransform; // Reference to the camera's transform
+    private Transform cameraTransform;
 
     void Start()
     {
         cameraTransform = Camera.main.transform;
 
-        if (playerTransform == null)
+        if (cameraSettings == null)
         {
-            Debug.LogWarning("Player Transform is not assigned. CameraManager will not follow the player.");
-        }
-        else
-        {
-            PositionCamera();
+            Debug.LogError("CameraSettings ScriptableObject is not assigned.");
         }
     }
 
@@ -32,30 +25,39 @@ public class CameraManager : MonoBehaviour
         }
     }
 
-    // Public method to set the player reference (called after player is spawned)
     public void SetPlayer(Transform player)
     {
+        if (player == null)
+        {
+            Debug.LogError("Player Transform is null when passed to CameraManager.");
+            return;
+        }
+
         playerTransform = player;
         PositionCamera();
     }
 
     private void PositionCamera()
     {
-        // Position the camera based on the player's position and the offset
-        Vector3 desiredPosition = playerTransform.position + offset;
+        if (playerTransform == null || cameraTransform == null || cameraSettings == null)
+        {
+            Debug.LogWarning("PositionCamera: Missing required references or settings.");
+            return;
+        }
+
+        Vector3 desiredPosition = playerTransform.position + cameraSettings.offset;
         cameraTransform.position = desiredPosition;
 
-        // Set the rotation of the camera to look at the player from the specified angle
-        cameraTransform.rotation = Quaternion.Euler(rotationAngle, 0, 0);
+        cameraTransform.rotation = Quaternion.Euler(cameraSettings.rotationAngle, 0, 0);
     }
 
     private void FollowPlayer()
     {
-        // Smoothly interpolate to the desired position
-        Vector3 desiredPosition = playerTransform.position + offset;
-        cameraTransform.position = Vector3.Lerp(cameraTransform.position, desiredPosition, followSpeed * Time.deltaTime);
+        if (playerTransform == null || cameraTransform == null || cameraSettings == null) return;
 
-        // Keep the rotation fixed
-        cameraTransform.rotation = Quaternion.Euler(rotationAngle, 0, 0);
+        Vector3 desiredPosition = playerTransform.position + cameraSettings.offset;
+        cameraTransform.position = Vector3.Lerp(cameraTransform.position, desiredPosition, cameraSettings.followSpeed * Time.deltaTime);
+
+        cameraTransform.rotation = Quaternion.Euler(cameraSettings.rotationAngle, 0, 0);
     }
 }

@@ -21,7 +21,7 @@ public class EnemyController : MonoBehaviour
             agent.autoRepath = true;
             agent.acceleration = 8f;
             agent.avoidancePriority = obstacleAvoidancePriority;
-            agent.speed = GetComponent<Enemy>()?.movementSpeed ?? 3f;
+            agent.speed = GetComponent<Enemy>()?.GetCurrentSpeed() ?? 3f;
         }
 
         if (playerTransform == null)

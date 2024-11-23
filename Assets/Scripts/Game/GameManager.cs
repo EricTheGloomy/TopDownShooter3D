@@ -38,12 +38,19 @@ public class GameManager : MonoBehaviour
         mapManager.Initialize();
         obstacleSpawner.Initialize(mapManager.map, FindObjectOfType<ObstacleManager>());
         playerSpawner.Initialize(mapManager.map);
+
         if (playerManager.Player != null)
         {
-            cameraManager.SetPlayer(playerManager.Player.transform);
+            cameraManager.SetPlayer(playerManager.Player.transform); // Ensure SetPlayer is called after player initialization.
         }
+        else
+        {
+            Debug.LogError("PlayerManager.Player is null during GameManager initialization.");
+        }
+
         enemySpawner.Initialize(mapManager.map, FindObjectOfType<ObstacleManager>());
 
         Debug.Log("Game Initialized!");
     }
+
 }
