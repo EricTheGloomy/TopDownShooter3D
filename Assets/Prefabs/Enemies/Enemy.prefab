@@ -183,5 +183,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 27ca8f32fe8a844488779275c6c64612, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  agent: {fileID: 0}
+  playerTransform: {fileID: 0}
+  settings: {fileID: 11400000, guid: 5f0961b15af420047b154b2690f85110, type: 2}
   targetUpdateInterval: 0.1
+  stoppingDistance: 0.5
+  acceleration: 8
   obstacleAvoidancePriority: 50

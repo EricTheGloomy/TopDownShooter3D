@@ -1,5 +1,5 @@
-using UnityEngine;
 using System.Collections.Generic;
+using UnityEngine;
 
 public class EnemySpawner : MonoBehaviour
 {
@@ -10,14 +10,18 @@ public class EnemySpawner : MonoBehaviour
 
     private Map map;
     private ObstacleManager obstacleManager;
+    private EnemyManager enemyManager;
+    private Transform playerTransform;
 
-    public void Initialize(Map mapReference, ObstacleManager obstacleManagerReference)
+    public void Initialize(Map mapReference, ObstacleManager obstacleManagerReference, Transform player)
     {
         Debug.Log("Initializing EnemySpawner...");
         map = mapReference;
         obstacleManager = obstacleManagerReference;
+        playerTransform = player;
 
-        if (map == null || obstacleManager == null)
+        enemyManager = FindObjectOfType<EnemyManager>();
+        if (map == null || obstacleManager == null || enemyManager == null)
         {
             Debug.LogError("EnemySpawner dependencies are missing.");
             return;
@@ -36,13 +40,7 @@ public class EnemySpawner : MonoBehaviour
             return;
         }
 
-        Transform enemyParent = FindObjectOfType<EnemyManager>()?.transform;
-        if (enemyParent == null)
-        {
-            Debug.LogError("EnemyManager GameObject is missing.");
-            return;
-        }
-
+        Transform enemyParent = enemyManager.transform;
         List<Tile> tiles = new List<Tile>(map.GetAllTiles());
         int enemiesPerTile = Mathf.CeilToInt((float)enemiesToSpawn / tiles.Count);
 
@@ -55,16 +53,35 @@ public class EnemySpawner : MonoBehaviour
                 if (validPosition.HasValue)
                 {
                     GameObject enemy = Instantiate(enemyPrefab, validPosition.Value, Quaternion.identity, enemyParent);
-
-                    // Randomize obstacle avoidance priority
-                    EnemyController enemyController = enemy.GetComponent<EnemyController>();
-                    if (enemyController != null)
-                    {
-                        enemyController.SetObstaclePriority(Random.Range(minObstaclePriority, maxObstaclePriority));
-                    }
-
-                    FindObjectOfType<EnemyManager>()?.AddEnemy(enemy);
+                    InitializeEnemy(enemy); // Moved initialization logic here
+                    enemyManager.AddEnemy(enemy);
                 }
+            }
+        }
+    }
+
+    // New helper method to initialize the enemy completely
+    private void InitializeEnemy(GameObject enemy)
+    {
+        var enemyController = enemy.GetComponent<EnemyController>();
+        if (enemyController != null)
+        {
+            // Ensure agent and settings are properly initialized
+            enemyController.InitializeAgent();
+
+            // Randomize obstacle avoidance priority
+            int randomizedPriority = Random.Range(minObstaclePriority, maxObstaclePriority);
+            enemyController.SetObstaclePriority(randomizedPriority);
+            Debug.Log($"Enemy {enemy.name} obstacle priority set to {randomizedPriority}");
+
+            // Assign player transform
+            if (playerTransform != null)
+            {
+                enemyController.SetPlayerTransform(playerTransform);
+            }
+            else
+            {
+                Debug.LogError("Player Transform is null. Enemies cannot track the player.");
             }
         }
     }

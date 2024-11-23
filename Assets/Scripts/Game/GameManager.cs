@@ -41,14 +41,17 @@ public class GameManager : MonoBehaviour
 
         if (playerManager.Player != null)
         {
-            cameraManager.SetPlayer(playerManager.Player.transform); // Ensure SetPlayer is called after player initialization.
+            cameraManager.SetPlayer(playerManager.Player.transform);
+
+            // Pass player transform to EnemyManager
+            enemyManager.SetPlayerTransform(playerManager.Player.transform);
         }
         else
         {
             Debug.LogError("PlayerManager.Player is null during GameManager initialization.");
         }
 
-        enemySpawner.Initialize(mapManager.map, FindObjectOfType<ObstacleManager>());
+        enemySpawner.Initialize(mapManager.map, FindObjectOfType<ObstacleManager>(), playerManager.Player.transform);
 
         Debug.Log("Game Initialized!");
     }
