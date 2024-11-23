@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using UnityEngine;
 
 public class EnemyManager : MonoBehaviour
@@ -6,55 +7,84 @@ public class EnemyManager : MonoBehaviour
     private List<GameObject> enemies = new List<GameObject>();
     private Transform playerTransform; // Reference to the player
 
+
     public void SetPlayerTransform(Transform player)
     {
-        playerTransform = player;
+        if (player == null)
+        {
+            Debug.LogWarning("Player Transform is null. Enemies will not have a target.");
+            return;
+        }
 
-        // Assign the player transform to all existing enemies
+        playerTransform = player;
         foreach (var enemy in enemies)
         {
-            var enemyController = enemy.GetComponent<EnemyController>();
-            if (enemyController != null)
-            {
-                enemyController.SetPlayerTransform(playerTransform);
-            }
+            AssignPlayerToEnemy(enemy);
         }
     }
 
     public void AddEnemy(GameObject enemy)
     {
+        if (enemy == null)
+        {
+            Debug.LogWarning("Cannot add a null enemy.");
+            return;
+        }
+
         if (!enemies.Contains(enemy))
         {
             enemies.Add(enemy);
-
-            // Assign the player transform to the new enemy
-            var enemyController = enemy.GetComponent<EnemyController>();
-            if (enemyController != null && playerTransform != null)
-            {
-                enemyController.SetPlayerTransform(playerTransform);
-            }
+            AssignPlayerToEnemy(enemy);
         }
     }
 
     public void RemoveEnemy(GameObject enemy)
     {
-        if (enemies.Contains(enemy))
+        if (enemy == null)
         {
-            enemies.Remove(enemy);
+            Debug.LogWarning("Cannot remove a null enemy.");
+            return;
         }
+
+        if (!enemies.Contains(enemy))
+        {
+            Debug.LogWarning("The enemy is not managed by this EnemyManager.");
+            return;
+        }
+
+        enemies.Remove(enemy);
     }
 
-    public List<GameObject> GetAllEnemies()
+    public IReadOnlyList<GameObject> GetAllEnemies()
     {
-        return new List<GameObject>(enemies); // Return a copy
+        return enemies.AsReadOnly();
     }
 
     public void DestroyAllEnemies()
     {
         foreach (var enemy in enemies)
         {
-            Destroy(enemy);
+            if (enemy != null)
+            {
+                Destroy(enemy);
+            }
         }
+
         enemies.Clear();
+    }
+
+    private void AssignPlayerToEnemy(GameObject enemy)
+    {
+        var enemyController = enemy.GetComponent<EnemyController>();
+        if (enemyController == null)
+        {
+            Debug.LogWarning($"Enemy {enemy.name} does not have an EnemyController component.");
+            return;
+        }
+
+        if (playerTransform != null)
+        {
+            enemyController.SetPlayerTransform(playerTransform);
+        }
     }
 }

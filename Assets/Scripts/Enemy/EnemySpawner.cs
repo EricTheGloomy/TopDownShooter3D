@@ -3,10 +3,9 @@ using UnityEngine;
 
 public class EnemySpawner : MonoBehaviour
 {
-    public GameObject enemyPrefab;
-    public int enemiesToSpawn;
-    public int minObstaclePriority; // Minimum avoidance priority
-    public int maxObstaclePriority; // Maximum avoidance priority
+    [Header("Prefab & Settings")]
+    [SerializeField] private GameObject enemyPrefab;
+    [SerializeField] private EnemySpawnerSettings settings; // ScriptableObject for configurations
 
     private Map map;
     private ObstacleManager obstacleManager;
@@ -28,7 +27,6 @@ public class EnemySpawner : MonoBehaviour
         }
 
         SpawnEnemies();
-
         Debug.Log("EnemySpawner initialized.");
     }
 
@@ -42,54 +40,75 @@ public class EnemySpawner : MonoBehaviour
 
         Transform enemyParent = enemyManager.transform;
         List<Tile> tiles = new List<Tile>(map.GetAllTiles());
-        int enemiesPerTile = Mathf.CeilToInt((float)enemiesToSpawn / tiles.Count);
+
+        if (tiles.Count == 0)
+        {
+            Debug.LogWarning("No tiles found on the map for spawning enemies.");
+            return;
+        }
+
+        int enemiesPerTile = Mathf.CeilToInt((float)settings.enemiesToSpawn / tiles.Count);
 
         foreach (var tile in tiles)
         {
-            for (int i = 0; i < enemiesPerTile; i++)
-            {
-                Vector3? validPosition = FindValidPosition(tile);
+            SpawnEnemiesOnTile(tile, enemiesPerTile, enemyParent);
+        }
+    }
 
-                if (validPosition.HasValue)
-                {
-                    GameObject enemy = Instantiate(enemyPrefab, validPosition.Value, Quaternion.identity, enemyParent);
-                    InitializeEnemy(enemy); // Moved initialization logic here
-                    enemyManager.AddEnemy(enemy);
-                }
+    private void SpawnEnemiesOnTile(Tile tile, int enemiesPerTile, Transform enemyParent)
+    {
+        for (int i = 0; i < enemiesPerTile; i++)
+        {
+            Vector3? validPosition = FindValidPosition(tile);
+
+            if (validPosition.HasValue)
+            {
+                GameObject enemy = Instantiate(enemyPrefab, validPosition.Value, Quaternion.identity, enemyParent);
+                InitializeEnemy(enemy);
+                enemyManager.AddEnemy(enemy);
             }
         }
     }
 
-    // New helper method to initialize the enemy completely
     private void InitializeEnemy(GameObject enemy)
     {
-        var enemyController = enemy.GetComponent<EnemyController>();
-        if (enemyController != null)
+        if (enemy == null)
         {
-            // Ensure agent and settings are properly initialized
-            enemyController.InitializeAgent();
-
-            // Randomize obstacle avoidance priority
-            int randomizedPriority = Random.Range(minObstaclePriority, maxObstaclePriority);
-            enemyController.SetObstaclePriority(randomizedPriority);
-            Debug.Log($"Enemy {enemy.name} obstacle priority set to {randomizedPriority}");
-
-            // Assign player transform
-            if (playerTransform != null)
-            {
-                enemyController.SetPlayerTransform(playerTransform);
-            }
-            else
-            {
-                Debug.LogError("Player Transform is null. Enemies cannot track the player.");
-            }
+            Debug.LogError("Attempted to initialize a null enemy.");
+            return;
         }
+
+        var enemyController = enemy.GetComponent<EnemyController>();
+        if (enemyController == null)
+        {
+            Debug.LogWarning($"Enemy {enemy.name} does not have an EnemyController component.");
+            return;
+        }
+
+        // Set obstacle avoidance priority
+        int randomizedPriority = Random.Range(settings.minObstaclePriority, settings.maxObstaclePriority);
+        enemyController.SetObstaclePriority(randomizedPriority);
+
+        Debug.Log($"Enemy {enemy.name} obstacle priority set to {randomizedPriority}");
+
+        // Assign player transform
+        if (playerTransform != null)
+        {
+            enemyController.SetPlayerTransform(playerTransform);
+        }
+        else
+        {
+            Debug.LogError("Player Transform is null. Enemies cannot track the player.");
+        }
+
+        // Initialize agent-specific properties
+        enemyController.InitializeAgent();
     }
 
     private Vector3? FindValidPosition(Tile tile)
     {
-        int maxRetries = 50;
-        float enemyRadius = 0.25f; // Adjust based on enemy size
+        int maxRetries = settings.maxRetries;
+        float enemyRadius = settings.enemyRadius;
         int obstacleLayerMask = 1 << LayerMask.NameToLayer("Obstacle");
 
         for (int attempt = 0; attempt < maxRetries; attempt++)
