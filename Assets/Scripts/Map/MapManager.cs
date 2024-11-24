@@ -12,14 +12,39 @@ public class MapManager : MonoBehaviour
 
     public void Initialize()
     {
-        if (mapSpawner == null || navMeshSurface == null || map == null || mapConfig == null)
+        if (!ValidateDependencies()) return;
+
+        map.Initialize(mapConfig.GridWidth, mapConfig.GridHeight);
+        mapSpawner.PopulateMap(map, mapConfig.TileConfig);
+        BakeNavMesh();
+    }
+
+    private bool ValidateDependencies()
+    {
+        bool isValid = true;
+
+        if (mapSpawner == null)
         {
-            throw new MissingReferenceException("MapManager dependencies are not assigned.");
+            Debug.LogError("MapSpawner is missing.");
+            isValid = false;
+        }
+        if (navMeshSurface == null)
+        {
+            Debug.LogError("NavMeshSurface is missing.");
+            isValid = false;
+        }
+        if (map == null)
+        {
+            Debug.LogError("Map is missing.");
+            isValid = false;
+        }
+        if (mapConfig == null)
+        {
+            Debug.LogError("MapConfig is missing.");
+            isValid = false;
         }
 
-        map.Initialize(mapConfig.gridWidth, mapConfig.gridHeight);
-        mapSpawner.PopulateMap(map, mapConfig.tileConfig);
-        BakeNavMesh();
+        return isValid;
     }
 
     private void BakeNavMesh()
