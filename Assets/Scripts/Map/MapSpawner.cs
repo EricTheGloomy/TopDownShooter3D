@@ -1,65 +1,62 @@
-// Scripts/Map/MapSpawner.cs
 using UnityEngine;
 
 public class MapSpawner : MonoBehaviour
 {
-    public GameObject mapTilePrefab; // Assign the MapTile prefab in the Inspector
-    public GameObject mapContainer; // Assign MapContainer in the Inspector, or it will create one
+    public TileConfig tileConfig;
+    public GameObject mapContainer;
 
-    public int gridWidth = 5; // Number of tiles along the X-axis
-    public int gridHeight = 5; // Number of tiles along the Z-axis
-
-    public void PopulateMap(Map map)
+    public void PopulateMap(Map map, TileConfig tileConfig)
     {
-        // Ensure MapContainer exists
+        if (tileConfig == null || tileConfig.tilePrefab == null)
+        {
+            throw new MissingReferenceException("TileConfig or tilePrefab is not assigned in MapSpawner.");
+        }
+
         if (mapContainer == null)
         {
             mapContainer = new GameObject("MapContainer");
         }
 
-        // Get tile size by instantiating a temporary tile
-        GameObject tempTile = Instantiate(mapTilePrefab);
-        Tile tempTileScript = tempTile.GetComponent<Tile>();
-        if (tempTileScript == null)
+        Vector3 tileSize = tileConfig.tileSize;
+
+        if (tileSize == Vector3.zero)
         {
-            tempTileScript = tempTile.AddComponent<Tile>();
+            tileSize = CalculateTileSize(tileConfig.tilePrefab);
         }
-        Vector3 tileSize = tempTileScript.TileSize;
-        Destroy(tempTile); // Clean up temporary tile
 
-        Debug.Log($"Tile size detected: {tileSize}");
-
-        // Use the tile size to calculate the spacing
-        float tileWidth = tileSize.x;
-        float tileDepth = tileSize.z;
-
-        // Generate the grid
-        for (int x = 0; x < gridWidth; x++)
+        for (int x = 0; x < map.Width; x++)
         {
-            for (int z = 0; z < gridHeight; z++)
+            for (int z = 0; z < map.Height; z++)
             {
-                Vector3 position = new Vector3(x * tileWidth, 0, z * tileDepth);
+                Vector3 position = new Vector3(x * tileConfig.desiredSize.x, 0, z * tileConfig.desiredSize.z);
                 GameObject tileObject = SpawnTile(position);
 
-                // Add the tile to the map
                 Tile tile = tileObject.GetComponent<Tile>();
-                map.AddTile(tile, x, z);
+                if (tile != null)
+                {
+                    tile.Initialize(tileConfig.desiredSize); // Pass desired size to Tile
+                    map.AddTile(tile, x, z);
+                }
             }
         }
     }
 
-    // Spawns a single tile at the given position
     private GameObject SpawnTile(Vector3 position)
     {
-        if (mapTilePrefab == null)
-        {
-            Debug.LogError("MapTilePrefab is not assigned.");
-            return null;
-        }
-
-        GameObject newTile = Instantiate(mapTilePrefab, position, Quaternion.identity);
+        GameObject newTile = Instantiate(tileConfig.tilePrefab, position, Quaternion.identity);
         newTile.transform.SetParent(mapContainer.transform);
         newTile.name = $"Tile_{position.x}_{position.y}_{position.z}";
         return newTile;
+    }
+
+    private Vector3 CalculateTileSize(GameObject tilePrefab)
+    {
+        GameObject tempTile = Instantiate(tilePrefab);
+        Renderer renderer = tempTile.GetComponent<Renderer>();
+        Vector3 size = renderer != null ? renderer.bounds.size : Vector3.one;
+        Destroy(tempTile);
+
+        Debug.Log($"Calculated tile size: {size}");
+        return size;
     }
 }

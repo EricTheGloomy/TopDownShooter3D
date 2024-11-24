@@ -1,36 +1,35 @@
-// Scripts/Map/MapManager.cs
 using Unity.AI.Navigation;
 using UnityEngine;
-using UnityEngine.AI;
 
 public class MapManager : MonoBehaviour
 {
-    [SerializeField] public MapSpawner mapSpawner; // Reference to the MapSpawner
-    [SerializeField] private NavMeshSurface navMeshSurface; // Reference to the NavMeshSurface
-    [SerializeField] public Map map; // Reference to the Map script
+    [SerializeField] private MapSpawner mapSpawner;
+    [SerializeField] private NavMeshSurface navMeshSurface;
+    [SerializeField] private Map map;
+    [SerializeField] private MapConfig mapConfig;
+
+    public Map GetMap() => map;
 
     public void Initialize()
     {
-        Debug.Log("Initializing MapManager...");
-
-        if (mapSpawner == null || navMeshSurface == null || map == null)
+        if (mapSpawner == null || navMeshSurface == null || map == null || mapConfig == null)
         {
-            Debug.LogError("MapManager dependencies are not assigned.");
-            return;
+            throw new MissingReferenceException("MapManager dependencies are not assigned.");
         }
 
-        // Initialize the Map
-        map.Initialize(mapSpawner.gridWidth, mapSpawner.gridHeight);
-        mapSpawner.PopulateMap(map);
-
-        // Bake the NavMesh after tiles are placed
+        map.Initialize(mapConfig.gridWidth, mapConfig.gridHeight);
+        mapSpawner.PopulateMap(map, mapConfig.tileConfig);
         BakeNavMesh();
-
-        Debug.Log("MapManager initialized.");
     }
 
     private void BakeNavMesh()
     {
+        if (map.GetAllTiles() == null)
+        {
+            Debug.LogError("Cannot bake NavMesh: No tiles in the map.");
+            return;
+        }
+
         Debug.Log("Baking NavMesh...");
         navMeshSurface.BuildNavMesh();
         Debug.Log("NavMesh baked successfully.");

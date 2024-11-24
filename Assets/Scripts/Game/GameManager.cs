@@ -36,8 +36,8 @@ public class GameManager : MonoBehaviour
         Debug.Log("Initializing Game...");
 
         mapManager.Initialize();
-        obstacleSpawner.Initialize(mapManager.map, FindObjectOfType<ObstacleManager>());
-        playerSpawner.Initialize(mapManager.map);
+        obstacleSpawner.Initialize(mapManager.GetMap(), FindObjectOfType<ObstacleManager>());
+        playerSpawner.Initialize(mapManager.GetMap());
 
         if (playerManager.Player != null)
         {
@@ -51,7 +51,7 @@ public class GameManager : MonoBehaviour
             Debug.LogError("PlayerManager.Player is null during GameManager initialization.");
         }
 
-        enemySpawner.Initialize(mapManager.map, FindObjectOfType<ObstacleManager>(), playerManager.Player.transform);
+        enemySpawner.Initialize(mapManager.GetMap(), FindObjectOfType<ObstacleManager>(), playerManager.Player.transform);
 
         Debug.Log("Game Initialized!");
     }

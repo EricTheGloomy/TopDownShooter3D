@@ -9,11 +9,8 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8101285beb093b949a86f65454f4219d, type: 3}
-  m_Name: EnemySpawnerSettings
+  m_Script: {fileID: 11500000, guid: a5875b1fb12f3bb46a5c0d123cf130f2, type: 3}
+  m_Name: TileConfig
   m_EditorClassIdentifier: 
-  enemiesToSpawn: 10
-  enemyRadius: 0.25
-  maxRetries: 50
-  minObstaclePriority: 30
-  maxObstaclePriority: 60
+  tilePrefab: {fileID: 2806318130173897829, guid: c18943b1f8c6fd54cbab043f7a6e5816, type: 3}
+  tileSize: {x: 0, y: 0, z: 0}

@@ -1,20 +1,29 @@
-// Scripts/Map/Tile.cs
 using UnityEngine;
 
 public class Tile : MonoBehaviour
 {
-    // Store the tile size for external use
     public Vector3 TileSize { get; private set; }
-    public float TileHeight { get; private set; } // Store the height of the tile
+    public float TileHeight { get; private set; }
 
-    private void Awake()
+    public void Initialize(Vector3 desiredSize)
     {
-        // Automatically calculate and store the tile size when the script is first loaded
         Renderer renderer = GetComponent<Renderer>();
         if (renderer != null)
         {
             TileSize = renderer.bounds.size;
-            TileHeight = TileSize.y; // The height of the tile is the Y size
+            TileHeight = TileSize.y;
+
+            // Calculate and apply scale factor
+            Vector3 scaleFactor = new Vector3(
+                desiredSize.x / TileSize.x,
+                desiredSize.y / TileSize.y,
+                desiredSize.z / TileSize.z
+            );
+            transform.localScale = Vector3.Scale(transform.localScale, scaleFactor);
+
+            // Recalculate size after scaling
+            TileSize = renderer.bounds.size;
+            TileHeight = TileSize.y;
         }
         else
         {

@@ -610,9 +610,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   enemyPrefab: {fileID: 8834230414387790470, guid: 9d2edc4bcd2438e45bd30c475cc42e9c, type: 3}
-  enemiesToSpawn: 1
-  minObstaclePriority: 30
-  maxObstaclePriority: 60
+  settings: {fileID: 11400000, guid: f49f093eed452f441a78bcbab496b268, type: 2}
 --- !u!4 &1318653901
 Transform:
   m_ObjectHideFlags: 0
@@ -763,8 +761,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 38d567986085efd42b6d9cf73404e857, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Width: 0
-  Height: 0
 --- !u!4 &1743372862
 Transform:
   m_ObjectHideFlags: 0
@@ -919,6 +915,7 @@ MonoBehaviour:
   mapSpawner: {fileID: 1993948600}
   navMeshSurface: {fileID: 484119846}
   map: {fileID: 1743372861}
+  mapConfig: {fileID: 11400000, guid: 1b75e6fe61987d4438efa2c89916728b, type: 2}
 --- !u!4 &1980897851
 Transform:
   m_ObjectHideFlags: 0
@@ -963,10 +960,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ea0e57bf10a26ef4eacc344457a5a6c2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mapTilePrefab: {fileID: 2806318130173897829, guid: c18943b1f8c6fd54cbab043f7a6e5816, type: 3}
+  tileConfig: {fileID: 11400000, guid: 2bfc20d519781504e9e66dcb203101e5, type: 2}
   mapContainer: {fileID: 1743372860}
-  gridWidth: 5
-  gridHeight: 5
 --- !u!4 &1993948601
 Transform:
   m_ObjectHideFlags: 0
