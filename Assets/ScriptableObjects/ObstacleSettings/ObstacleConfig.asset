@@ -12,7 +12,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5caff8edb9efb624183e93ba00a26156, type: 3}
   m_Name: ObstacleConfig
   m_EditorClassIdentifier: 
-  obstaclesPerTile: 2
-  maxRetries: 50
-  obstacleLayer: Obstacle
-  defaultObstacleRadius: 0.5
+  DefaultObstaclePrefab: {fileID: 8361594299122610591, guid: c22ef0afbcc047445904ae47420909be, type: 3}
+  AllowVariants: 0
+  VariantPrefabs: []
+  ObstaclesPerTile: 2
+  MaxRetries: 50
+  DefaultObstacleRadius: 0.5
+  AllowScaling: 0
+  MinScale: {x: 0.8, y: 0.8, z: 0.8}
+  MaxScale: {x: 1.2, y: 1.2, z: 1.2}
+  ObstacleLayer: Obstacle

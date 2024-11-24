@@ -1,10 +1,23 @@
-// Scripts/Obstacle/ObstacleManager.cs
 using System.Collections.Generic;
 using UnityEngine;
 
 public class ObstacleManager : MonoBehaviour
 {
+    private static ObstacleManager instance;
+    public static ObstacleManager Instance => instance;
+
     private readonly List<GameObject> obstacles = new();
+
+    private void Awake()
+    {
+        if (instance != null && instance != this)
+        {
+            Destroy(this);
+            return;
+        }
+
+        instance = this;
+    }
 
     public void AddObstacle(GameObject obstacle)
     {
@@ -28,10 +41,7 @@ public class ObstacleManager : MonoBehaviour
             return;
         }
 
-        if (obstacles.Contains(obstacle))
-        {
-            obstacles.Remove(obstacle);
-        }
+        obstacles.Remove(obstacle);
     }
 
     public IReadOnlyList<GameObject> GetAllObstacles()
@@ -43,7 +53,7 @@ public class ObstacleManager : MonoBehaviour
     {
         foreach (var obstacle in obstacles)
         {
-            Destroy(obstacle);
+            if (obstacle != null) Destroy(obstacle);
         }
         obstacles.Clear();
     }

@@ -45,7 +45,7 @@ public class GameManager : MonoBehaviour
         Debug.Log("Initializing Game...");
 
         mapManager.Initialize();
-        obstacleSpawner.Initialize(mapManager.GetMap(), obstacleManager);
+        obstacleSpawner.Initialize(mapManager.GetMap());
         playerSpawner.Initialize(mapManager.GetMap());
 
         if (playerManager.Player != null)
