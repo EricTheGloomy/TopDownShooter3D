@@ -241,6 +241,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9a9e9323391e6584a98c45aec25f6cbe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  mapManager: {fileID: 1980897850}
+  obstacleSpawner: {fileID: 2145653936}
+  playerSpawner: {fileID: 1930382853}
+  playerManager: {fileID: 1384513711}
+  cameraManager: {fileID: 402115889}
+  enemySpawner: {fileID: 1318653900}
+  enemyManager: {fileID: 170869143}
+  obstacleManager: {fileID: 495314114}
 --- !u!4 &467032333
 Transform:
   m_ObjectHideFlags: 0

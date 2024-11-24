@@ -14,4 +14,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   tilePrefab: {fileID: 2806318130173897829, guid: c18943b1f8c6fd54cbab043f7a6e5816, type: 3}
   tileSize: {x: 0, y: 0, z: 0}
-  desiredSize: {x: 10, y: 1, z: 10}
+  desiredSize: {x: 5, y: 1, z: 5}
