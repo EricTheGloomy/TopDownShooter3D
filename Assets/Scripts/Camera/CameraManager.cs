@@ -2,14 +2,20 @@ using UnityEngine;
 
 public class CameraManager : MonoBehaviour
 {
-    [SerializeField] private CameraSettings cameraSettings; // Reference to the settings
-    [SerializeField] private Transform playerTransform;     // Player Transform (assigned at runtime)
+    [SerializeField] private CameraSettings cameraSettings;
+    [SerializeField] private Transform playerTransform;
 
     private Transform cameraTransform;
 
     void Start()
     {
-        cameraTransform = Camera.main.transform;
+        cameraTransform = Camera.main?.transform;
+
+        if (cameraTransform == null)
+        {
+            Debug.LogError("Main Camera not found!");
+            return;
+        }
 
         if (cameraSettings == null)
         {
@@ -19,10 +25,9 @@ public class CameraManager : MonoBehaviour
 
     void FixedUpdate()
     {
-        if (playerTransform != null)
-        {
-            FollowPlayer();
-        }
+        if (playerTransform == null || cameraSettings == null || cameraTransform == null) return;
+
+        FollowPlayer();
     }
 
     public void SetPlayer(Transform player)
@@ -39,25 +44,25 @@ public class CameraManager : MonoBehaviour
 
     private void PositionCamera()
     {
-        if (playerTransform == null || cameraTransform == null || cameraSettings == null)
+        if (cameraSettings == null || playerTransform == null || cameraTransform == null)
         {
-            Debug.LogWarning("PositionCamera: Missing required references or settings.");
+            Debug.LogWarning("PositionCamera: Missing required references.");
             return;
         }
 
-        Vector3 desiredPosition = playerTransform.position + cameraSettings.offset;
-        cameraTransform.position = desiredPosition;
-
-        cameraTransform.rotation = Quaternion.Euler(cameraSettings.rotationAngle, 0, 0);
+        cameraTransform.position = playerTransform.position + cameraSettings.Offset;
+        cameraTransform.rotation = Quaternion.Euler(cameraSettings.RotationAngle, 0, 0);
     }
 
     private void FollowPlayer()
     {
-        if (playerTransform == null || cameraTransform == null || cameraSettings == null) return;
-
-        Vector3 desiredPosition = playerTransform.position + cameraSettings.offset;
-        cameraTransform.position = Vector3.Lerp(cameraTransform.position, desiredPosition, cameraSettings.followSpeed * Time.deltaTime);
-
-        cameraTransform.rotation = Quaternion.Euler(cameraSettings.rotationAngle, 0, 0);
+        Vector3 targetPosition = playerTransform.position + cameraSettings.Offset;
+        cameraTransform.position = Vector3.Lerp(
+            cameraTransform.position, 
+            targetPosition, 
+            cameraSettings.FollowSpeed * Time.deltaTime
+        );
     }
 }
+
+
