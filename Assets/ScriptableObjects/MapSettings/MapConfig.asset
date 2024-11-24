@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 241a5e7b145d6bb4cbd417f6c812ed0a, type: 3}
   m_Name: MapConfig
   m_EditorClassIdentifier: 
-  mapName: 
-  gridWidth: 8
-  gridHeight: 8
-  tileConfig: {fileID: 11400000, guid: 2bfc20d519781504e9e66dcb203101e5, type: 2}
-  backgroundColor: {r: 0, g: 0, b: 0, a: 0}
+  GridWidth: 5
+  GridHeight: 5
+  TileConfig: {fileID: 11400000, guid: 2bfc20d519781504e9e66dcb203101e5, type: 2}
+  MapName: 
+  BackgroundColor: {r: 0, g: 0, b: 0, a: 0}

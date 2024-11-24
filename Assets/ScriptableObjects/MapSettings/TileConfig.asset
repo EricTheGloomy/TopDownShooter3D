@@ -12,6 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a5875b1fb12f3bb46a5c0d123cf130f2, type: 3}
   m_Name: TileConfig
   m_EditorClassIdentifier: 
-  tilePrefab: {fileID: 2806318130173897829, guid: c18943b1f8c6fd54cbab043f7a6e5816, type: 3}
-  tileSize: {x: 0, y: 0, z: 0}
-  desiredSize: {x: 5, y: 1, z: 5}
+  TilePrefab: {fileID: 2806318130173897829, guid: c18943b1f8c6fd54cbab043f7a6e5816, type: 3}
+  TileSize: {x: 0, y: 0, z: 0}
+  DesiredSize: {x: 8, y: 1, z: 8}
+  AllowVariants: 0
+  VariantPrefabs:
+  - {fileID: 2806318130173897829, guid: c18943b1f8c6fd54cbab043f7a6e5816, type: 3}
