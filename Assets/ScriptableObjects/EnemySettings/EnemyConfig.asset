@@ -12,5 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9bd97be7a7949a449acd6ebf50d22d4e, type: 3}
   m_Name: EnemyConfig
   m_EditorClassIdentifier: 
-  health: 50
-  movementSpeed: 2.5
+  Health: 50
+  MovementSpeed: 3
+  Aggressive: 1
+  DetectionRange: 10

@@ -12,7 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 60ebd5bd399e98c4c88d23090ac8d87f, type: 3}
   m_Name: EnemyControllerSettings
   m_EditorClassIdentifier: 
-  targetUpdateInterval: 0.1
-  stoppingDistance: 0.5
-  acceleration: 8
-  obstacleAvoidancePriority: 50
+  TargetUpdateInterval: 0.1
+  StoppingDistance: 0.5
+  Acceleration: 8
+  MaxSpeedMultiplier: 1.5
+  ObstacleAvoidancePriority: 50
