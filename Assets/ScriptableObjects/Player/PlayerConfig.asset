@@ -9,9 +9,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a5875b1fb12f3bb46a5c0d123cf130f2, type: 3}
-  m_Name: TileConfig
+  m_Script: {fileID: 11500000, guid: 3c3e4f0b8278c05469585e0e8a42fa17, type: 3}
+  m_Name: PlayerConfig
   m_EditorClassIdentifier: 
-  tilePrefab: {fileID: 2806318130173897829, guid: c18943b1f8c6fd54cbab043f7a6e5816, type: 3}
-  tileSize: {x: 0, y: 0, z: 0}
-  desiredSize: {x: 10, y: 1, z: 10}
+  startingHealth: 100
+  maxHealth: 100
+  moveSpeed: 5
+  rotationSpeed: 180

@@ -4,7 +4,6 @@ using UnityEngine;
 public class PlayerManager : MonoBehaviour
 {
     public GameObject Player { get; private set; }
-    public int Health { get; private set; } = 100;
 
     public void SetPlayer(GameObject player)
     {
@@ -18,23 +17,9 @@ public class PlayerManager : MonoBehaviour
         Debug.Log("Player has been set in PlayerManager.");
     }
 
-    public void TakeDamage(int amount)
+    public void HandlePlayerDeath()
     {
-        Health -= amount;
-        if (Health <= 0)
-        {
-            HandlePlayerDeath();
-        }
-    }
-
-    public void Heal(int amount)
-    {
-        Health = Mathf.Min(Health + amount, 100);
-    }
-
-    private void HandlePlayerDeath()
-    {
-        Debug.Log("Player has died!");
-        // Add respawn logic or game over logic here
+        Debug.Log("Player has died! Handle game-over or respawn logic here.");
+        // Add game-over screen, respawn logic, etc.
     }
 }

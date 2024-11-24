@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: MapConfig
   m_EditorClassIdentifier: 
   mapName: 
-  gridWidth: 6
-  gridHeight: 6
+  gridWidth: 8
+  gridHeight: 8
   tileConfig: {fileID: 11400000, guid: 2bfc20d519781504e9e66dcb203101e5, type: 2}
   backgroundColor: {r: 0, g: 0, b: 0, a: 0}

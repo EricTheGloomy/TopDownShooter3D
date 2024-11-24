@@ -4,23 +4,19 @@ using UnityEngine;
 
 public class PlayerSpawner : MonoBehaviour
 {
-    public GameObject playerPrefab; // Assign the Player prefab in the Inspector
-    private Map map; // Reference to the Map
+    [SerializeField] private GameObject playerPrefab;
+    private Map map;
 
     public void Initialize(Map mapReference)
     {
-        Debug.Log("Initializing PlayerSpawner...");
-        map = mapReference;
-
-        if (map == null)
+        if (mapReference == null)
         {
             Debug.LogError("Map reference is null. PlayerSpawner cannot initialize.");
             return;
         }
 
+        map = mapReference;
         SpawnPlayer();
-
-        Debug.Log("PlayerSpawner initialized.");
     }
 
     private void SpawnPlayer()
@@ -31,15 +27,22 @@ public class PlayerSpawner : MonoBehaviour
             return;
         }
 
-        // Try to find a valid spawn position
         Vector3? spawnPosition = FindValidSpawnPosition();
+
         if (spawnPosition.HasValue)
         {
             GameObject player = Instantiate(playerPrefab, spawnPosition.Value, Quaternion.identity);
             player.name = "Player";
 
-            // Let the PlayerManager handle the player instance
-            FindObjectOfType<PlayerManager>()?.SetPlayer(player);
+            var playerManager = FindObjectOfType<PlayerManager>();
+            if (playerManager != null)
+            {
+                playerManager.SetPlayer(player);
+            }
+            else
+            {
+                Debug.LogError("PlayerManager not found in the scene.");
+            }
         }
         else
         {
