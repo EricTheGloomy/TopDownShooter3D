@@ -8,24 +8,22 @@ public class Obstacle : MonoBehaviour
 
     private void Awake()
     {
-        Renderer renderer = GetComponent<Renderer>();
-        if (renderer != null)
-        {
-            ObstacleSize = renderer.bounds.size;
-            ObstacleHeight = ObstacleSize.y;
-        }
-        else
+        var renderer = GetComponent<Renderer>();
+        if (renderer == null)
         {
             Debug.LogError($"Obstacle {name} is missing a Renderer component.");
             ObstacleSize = Vector3.zero;
             ObstacleHeight = 0f;
+            return;
         }
+
+        ObstacleSize = renderer.bounds.size;
+        ObstacleHeight = ObstacleSize.y;
     }
 
     private void OnDestroy()
     {
-        // Notify ObstacleManager
-        ObstacleManager obstacleManager = FindObjectOfType<ObstacleManager>();
+        var obstacleManager = FindObjectOfType<ObstacleManager>();
         if (obstacleManager != null)
         {
             obstacleManager.RemoveObstacle(gameObject);

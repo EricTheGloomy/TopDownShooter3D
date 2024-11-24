@@ -1038,7 +1038,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   obstaclePrefab: {fileID: 8361594299122610591, guid: c22ef0afbcc047445904ae47420909be, type: 3}
-  obstaclesPerTile: 2
+  config: {fileID: 11400000, guid: e7e2aa4836dcfea4a948c9b95396e915, type: 2}
 --- !u!4 &2145653937
 Transform:
   m_ObjectHideFlags: 0

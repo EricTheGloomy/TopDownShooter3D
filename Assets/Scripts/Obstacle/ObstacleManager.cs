@@ -4,10 +4,16 @@ using UnityEngine;
 
 public class ObstacleManager : MonoBehaviour
 {
-    private List<GameObject> obstacles = new List<GameObject>();
+    private readonly List<GameObject> obstacles = new();
 
     public void AddObstacle(GameObject obstacle)
     {
+        if (obstacle == null)
+        {
+            Debug.LogWarning("Attempted to add a null obstacle.");
+            return;
+        }
+
         if (!obstacles.Contains(obstacle))
         {
             obstacles.Add(obstacle);
@@ -16,15 +22,21 @@ public class ObstacleManager : MonoBehaviour
 
     public void RemoveObstacle(GameObject obstacle)
     {
+        if (obstacle == null)
+        {
+            Debug.LogWarning("Attempted to remove a null obstacle.");
+            return;
+        }
+
         if (obstacles.Contains(obstacle))
         {
             obstacles.Remove(obstacle);
         }
     }
 
-    public List<GameObject> GetAllObstacles()
+    public IReadOnlyList<GameObject> GetAllObstacles()
     {
-        return new List<GameObject>(obstacles); // Return a copy for safety
+        return obstacles.AsReadOnly();
     }
 
     public void DestroyAllObstacles()

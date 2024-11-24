@@ -4,38 +4,32 @@ using UnityEngine;
 
 public class ObstacleSpawner : MonoBehaviour
 {
-    public GameObject obstaclePrefab;
-    public int obstaclesPerTile = 2;
+    [SerializeField] private GameObject obstaclePrefab;
+    [SerializeField] private ObstacleConfig config;
 
     private Map map;
-    private Dictionary<Tile, List<GameObject>> tileObstacles = new Dictionary<Tile, List<GameObject>>();
-    private ObstacleManager obstacleManager; // Reference to ObstacleManager
+    private readonly Dictionary<Tile, List<GameObject>> tileObstacles = new();
+    private ObstacleManager obstacleManager;
+
+    private float cachedObstacleRadius = -1f;
 
     public void Initialize(Map mapReference, ObstacleManager obstacleManagerReference)
     {
-        Debug.Log("Initializing ObstacleSpawner...");
-        map = mapReference;
-        obstacleManager = obstacleManagerReference;
-
-        if (map == null || obstacleManager == null)
+        if (mapReference == null || obstacleManagerReference == null || obstaclePrefab == null)
         {
-            Debug.LogError("ObstacleSpawner dependencies are not assigned.");
+            Debug.LogError("ObstacleSpawner dependencies are not properly assigned.");
             return;
         }
 
-        SpawnObstacles();
+        map = mapReference;
+        obstacleManager = obstacleManagerReference;
 
+        SpawnObstacles();
         Debug.Log("ObstacleSpawner initialized.");
     }
 
     private void SpawnObstacles()
     {
-        if (obstaclePrefab == null)
-        {
-            Debug.LogError("ObstaclePrefab is not assigned.");
-            return;
-        }
-
         foreach (var tile in map.GetAllTiles())
         {
             if (!tileObstacles.ContainsKey(tile))
@@ -43,18 +37,17 @@ public class ObstacleSpawner : MonoBehaviour
                 tileObstacles[tile] = new List<GameObject>();
             }
 
-            for (int i = 0; i < obstaclesPerTile; i++)
+            for (int i = 0; i < config.obstaclesPerTile; i++)
             {
-                Vector3? validPosition = FindValidPositionOnTile(tile);
-
+                var validPosition = FindValidPositionOnTile(tile);
                 if (validPosition.HasValue)
                 {
-                    GameObject obstacle = InstantiateAndRegisterObstacle(validPosition.Value, tileObstacles[tile].Count + 1, tile);
+                    var obstacle = InstantiateAndRegisterObstacle(validPosition.Value, tileObstacles[tile].Count + 1, tile);
                     tileObstacles[tile].Add(obstacle);
                 }
                 else
                 {
-                    Debug.LogWarning($"Could not find a valid position for an obstacle on tile {tile.name}.");
+                    Debug.LogWarning($"Could not find a valid position for an obstacle on tile {tile.name} after {config.maxRetries} retries.");
                 }
             }
         }
@@ -62,87 +55,73 @@ public class ObstacleSpawner : MonoBehaviour
         Debug.Log($"Obstacles spawned for {tileObstacles.Count} tiles.");
     }
 
-    // Combines functionality of both methods for spawning and registering an obstacle
     private GameObject InstantiateAndRegisterObstacle(Vector3 position, int index, Tile tile)
     {
         var obstacle = Instantiate(obstaclePrefab, position, Quaternion.identity);
-        obstacle.name = $"Obstacle_{index}";
-        obstacle.transform.SetParent(tile.transform); // Make it a child of the tile
 
-        Obstacle obstacleScript = obstacle.GetComponent<Obstacle>();
+        AdjustTransformForTile(obstacle.transform, tile.transform);
+
+        obstacle.name = $"Obstacle_{index}";
+
+        var obstacleScript = obstacle.GetComponent<Obstacle>();
         if (obstacleScript != null)
         {
             position.y += obstacleScript.ObstacleHeight / 2;
             obstacle.transform.position = position;
-
-            // Assign the obstacle to the "Obstacle" layer
-            obstacle.layer = LayerMask.NameToLayer("Obstacle");
+            obstacle.layer = LayerMask.NameToLayer(config.obstacleLayer);
         }
         else
         {
             Debug.LogError($"Obstacle {obstacle.name} is missing the Obstacle script.");
         }
 
-        // Register the obstacle with ObstacleManager
         obstacleManager.AddObstacle(obstacle);
 
         return obstacle;
     }
 
-    // Finds a valid position for an obstacle on a specific tile
+    private void AdjustTransformForTile(Transform obstacleTransform, Transform tileTransform)
+    {
+        obstacleTransform.SetParent(tileTransform, true);
+        Vector3 localScale = obstaclePrefab.transform.localScale;
+        localScale.x /= tileTransform.localScale.x;
+        localScale.y /= tileTransform.localScale.y;
+        localScale.z /= tileTransform.localScale.z;
+        obstacleTransform.localScale = localScale;
+    }
+
     private Vector3? FindValidPositionOnTile(Tile tile)
     {
-        int maxRetries = 50;
-        int obstacleLayerMask = 1 << LayerMask.NameToLayer("Obstacle");
-
-        for (int attempt = 0; attempt < maxRetries; attempt++)
+        float radius = GetObstacleRadius();
+        for (int attempt = 0; attempt < config.maxRetries; attempt++)
         {
-            Vector3 randomPosition = GetRandomPositionOnTile(tile, out float obstacleRadius);
-            if (IsPositionValid(randomPosition, obstacleRadius, obstacleLayerMask))
+            var position = tile.GetRandomPosition(radius);
+            if (IsPositionValid(position, radius))
             {
-                return randomPosition;
+                return position;
             }
         }
 
-        return null; // No valid position found
+        return null;
     }
 
-    // Generates a random position on the given tile within its safe bounds
-    private Vector3 GetRandomPositionOnTile(Tile tile, out float obstacleRadius)
+    private float GetObstacleRadius()
     {
-        var tileSize = tile.TileSize;
-        var tileCenter = tile.transform.position;
-
-        // Create a temporary obstacle to calculate its radius
-        GameObject tempObstacle = Instantiate(obstaclePrefab, tileCenter, Quaternion.identity);
-        Obstacle obstacleScript = tempObstacle.GetComponent<Obstacle>();
-        obstacleRadius = obstacleScript != null ? Mathf.Max(obstacleScript.ObstacleSize.x, obstacleScript.ObstacleSize.z) / 2 : 0;
-
-        Destroy(tempObstacle); // Clean up temporary obstacle
-
-        var (safeMinX, safeMaxX, safeMinZ, safeMaxZ) = CalculateSafeBounds(tileCenter, tileSize, obstacleRadius);
-
-        float randomX = Random.Range(safeMinX, safeMaxX);
-        float randomZ = Random.Range(safeMinZ, safeMaxZ);
-
-        return new Vector3(randomX, tileCenter.y + tile.TileHeight / 2, randomZ);
+        if (cachedObstacleRadius < 0f)
+        {
+            var tempObstacle = Instantiate(obstaclePrefab);
+            var obstacleScript = tempObstacle.GetComponent<Obstacle>();
+            cachedObstacleRadius = obstacleScript != null
+                ? Mathf.Max(obstacleScript.ObstacleSize.x, obstacleScript.ObstacleSize.z) / 2
+                : config.defaultObstacleRadius;
+            Destroy(tempObstacle);
+        }
+        return cachedObstacleRadius;
     }
 
-    // Calculates the safe spawn area for an obstacle
-    private (float safeMinX, float safeMaxX, float safeMinZ, float safeMaxZ) CalculateSafeBounds(Vector3 tileCenter, Vector3 tileSize, float obstacleRadius)
+    private bool IsPositionValid(Vector3 position, float radius)
     {
-        float safeMinX = tileCenter.x - (tileSize.x / 2) + obstacleRadius;
-        float safeMaxX = tileCenter.x + (tileSize.x / 2) - obstacleRadius;
-        float safeMinZ = tileCenter.z - (tileSize.z / 2) + obstacleRadius;
-        float safeMaxZ = tileCenter.z + (tileSize.z / 2) - obstacleRadius;
-
-        return (safeMinX, safeMaxX, safeMinZ, safeMaxZ);
-    }
-
-    // Validates if a position is within bounds and free of overlaps
-    private bool IsPositionValid(Vector3 position, float radius, int layerMask)
-    {
-        Collider[] colliders = Physics.OverlapSphere(position, radius, layerMask);
-        return colliders.Length == 0;
+        int layerMask = 1 << LayerMask.NameToLayer(config.obstacleLayer);
+        return Physics.OverlapSphere(position, radius, layerMask).Length == 0;
     }
 }
