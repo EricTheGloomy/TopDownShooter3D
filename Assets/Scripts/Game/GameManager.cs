@@ -58,7 +58,7 @@ public class GameManager : MonoBehaviour
             Debug.LogError("PlayerManager.Player is null during GameManager initialization.");
         }
 
-        enemySpawner.Initialize(mapManager.GetMap(), obstacleManager, playerManager.Player.transform);
+        enemySpawner.Initialize(mapManager.GetMap(), playerManager.Player.transform);
 
         Debug.Log("Game Initialized!");
     }

@@ -1,12 +1,24 @@
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using UnityEngine;
 
 public class EnemyManager : MonoBehaviour
 {
-    private List<GameObject> enemies = new List<GameObject>();
-    private Transform playerTransform; // Reference to the player
+    private static EnemyManager instance;
+    public static EnemyManager Instance => instance;
 
+    private readonly List<GameObject> enemies = new List<GameObject>();
+    private Transform playerTransform;
+
+    private void Awake()
+    {
+        if (instance != null && instance != this)
+        {
+            Destroy(this);
+            return;
+        }
+
+        instance = this;
+    }
 
     public void SetPlayerTransform(Transform player)
     {
@@ -17,6 +29,7 @@ public class EnemyManager : MonoBehaviour
         }
 
         playerTransform = player;
+
         foreach (var enemy in enemies)
         {
             AssignPlayerToEnemy(enemy);
@@ -25,32 +38,15 @@ public class EnemyManager : MonoBehaviour
 
     public void AddEnemy(GameObject enemy)
     {
-        if (enemy == null)
-        {
-            Debug.LogWarning("Cannot add a null enemy.");
-            return;
-        }
+        if (enemy == null || enemies.Contains(enemy)) return;
 
-        if (!enemies.Contains(enemy))
-        {
-            enemies.Add(enemy);
-            AssignPlayerToEnemy(enemy);
-        }
+        enemies.Add(enemy);
+        AssignPlayerToEnemy(enemy);
     }
 
     public void RemoveEnemy(GameObject enemy)
     {
-        if (enemy == null)
-        {
-            Debug.LogWarning("Cannot remove a null enemy.");
-            return;
-        }
-
-        if (!enemies.Contains(enemy))
-        {
-            Debug.LogWarning("The enemy is not managed by this EnemyManager.");
-            return;
-        }
+        if (enemy == null || !enemies.Contains(enemy)) return;
 
         enemies.Remove(enemy);
     }
@@ -64,10 +60,7 @@ public class EnemyManager : MonoBehaviour
     {
         foreach (var enemy in enemies)
         {
-            if (enemy != null)
-            {
-                Destroy(enemy);
-            }
+            if (enemy != null) Destroy(enemy);
         }
 
         enemies.Clear();
@@ -75,16 +68,9 @@ public class EnemyManager : MonoBehaviour
 
     private void AssignPlayerToEnemy(GameObject enemy)
     {
-        var enemyController = enemy.GetComponent<EnemyController>();
-        if (enemyController == null)
-        {
-            Debug.LogWarning($"Enemy {enemy.name} does not have an EnemyController component.");
-            return;
-        }
+        var controller = enemy.GetComponent<EnemyController>();
+        if (controller == null) return;
 
-        if (playerTransform != null)
-        {
-            enemyController.SetPlayerTransform(playerTransform);
-        }
+        controller.SetPlayerTransform(playerTransform);
     }
 }

@@ -3,26 +3,31 @@ using UnityEngine;
 
 public class EnemySpawner : MonoBehaviour
 {
-    [Header("Prefab & Settings")]
-    [SerializeField] private GameObject enemyPrefab;
-    [SerializeField] private EnemySpawnerSettings settings; // ScriptableObject for configurations
+    [SerializeField] private List<GameObject> enemyPrefabs;
+    [SerializeField] private EnemySpawnerSettings settings;
 
     private Map map;
-    private ObstacleManager obstacleManager;
     private EnemyManager enemyManager;
     private Transform playerTransform;
 
-    public void Initialize(Map mapReference, ObstacleManager obstacleManagerReference, Transform player)
+    public void Initialize(Map mapReference, Transform player)
     {
         Debug.Log("Initializing EnemySpawner...");
+
         map = mapReference;
-        obstacleManager = obstacleManagerReference;
         playerTransform = player;
 
-        enemyManager = FindObjectOfType<EnemyManager>();
-        if (map == null || obstacleManager == null || enemyManager == null)
+        enemyManager = EnemyManager.Instance;
+
+        if (map == null || enemyManager == null)
         {
             Debug.LogError("EnemySpawner dependencies are missing.");
+            return;
+        }
+
+        if (enemyPrefabs == null || enemyPrefabs.Count == 0)
+        {
+            Debug.LogError("No enemy prefabs assigned to EnemySpawner.");
             return;
         }
 
@@ -32,40 +37,38 @@ public class EnemySpawner : MonoBehaviour
 
     private void SpawnEnemies()
     {
-        if (enemyPrefab == null)
-        {
-            Debug.LogError("EnemyPrefab is not assigned.");
-            return;
-        }
-
-        Transform enemyParent = enemyManager.transform;
         List<Tile> tiles = new List<Tile>(map.GetAllTiles());
-
         if (tiles.Count == 0)
         {
-            Debug.LogWarning("No tiles found on the map for spawning enemies.");
+            Debug.LogWarning("No tiles available for spawning enemies.");
             return;
         }
 
-        int enemiesPerTile = Mathf.CeilToInt((float)settings.enemiesToSpawn / tiles.Count);
+        int enemiesPerTile = Mathf.CeilToInt((float)settings.EnemiesToSpawn / tiles.Count);
 
         foreach (var tile in tiles)
         {
-            SpawnEnemiesOnTile(tile, enemiesPerTile, enemyParent);
+            SpawnEnemiesOnTile(tile, enemiesPerTile);
         }
     }
 
-    private void SpawnEnemiesOnTile(Tile tile, int enemiesPerTile, Transform enemyParent)
+    private void SpawnEnemiesOnTile(Tile tile, int enemiesPerTile)
     {
         for (int i = 0; i < enemiesPerTile; i++)
         {
             Vector3? validPosition = FindValidPosition(tile);
 
-            if (validPosition.HasValue)
+            if (validPosition != null)
             {
-                GameObject enemy = Instantiate(enemyPrefab, validPosition.Value, Quaternion.identity, enemyParent);
+                var prefab = enemyPrefabs[Random.Range(0, enemyPrefabs.Count)];
+                var enemy = Instantiate(prefab, validPosition.Value, Quaternion.identity, enemyManager.transform);
+
                 InitializeEnemy(enemy);
                 enemyManager.AddEnemy(enemy);
+            }
+            else
+            {
+                Debug.LogWarning($"Failed to find valid spawn position on tile {tile.name}.");
             }
         }
     }
@@ -79,54 +82,34 @@ public class EnemySpawner : MonoBehaviour
         }
 
         var enemyController = enemy.GetComponent<EnemyController>();
-        if (enemyController == null)
-        {
-            Debug.LogWarning($"Enemy {enemy.name} does not have an EnemyController component.");
-            return;
-        }
-
-        // Set obstacle avoidance priority
-        int randomizedPriority = Random.Range(settings.minObstaclePriority, settings.maxObstaclePriority);
-        enemyController.SetObstaclePriority(randomizedPriority);
-
-        Debug.Log($"Enemy {enemy.name} obstacle priority set to {randomizedPriority}");
-
-        // Assign player transform
-        if (playerTransform != null)
+        if (enemyController != null)
         {
             enemyController.SetPlayerTransform(playerTransform);
+            enemyController.InitializeAgent();
         }
         else
         {
-            Debug.LogError("Player Transform is null. Enemies cannot track the player.");
+            Debug.LogWarning($"{enemy.name} does not have an EnemyController component.");
         }
-
-        // Initialize agent-specific properties
-        enemyController.InitializeAgent();
     }
 
     private Vector3? FindValidPosition(Tile tile)
     {
-        int maxRetries = settings.maxRetries;
-        float enemyRadius = settings.enemyRadius;
-        int obstacleLayerMask = 1 << LayerMask.NameToLayer("Obstacle");
-
-        for (int attempt = 0; attempt < maxRetries; attempt++)
+        for (int attempt = 0; attempt < settings.MaxRetries; attempt++)
         {
-            Vector3 tileCenter = tile.transform.position;
-            Vector3 tileSize = tile.TileSize;
+            Vector3 position = tile.GetRandomPosition(settings.EnemyRadius);
 
-            float randomX = Random.Range(tileCenter.x - tileSize.x / 2, tileCenter.x + tileSize.x / 2);
-            float randomZ = Random.Range(tileCenter.z - tileSize.z / 2, tileCenter.z + tileSize.z / 2);
-            Vector3 spawnPosition = new Vector3(randomX, tileCenter.y + 1, randomZ);
-
-            if (Physics.OverlapSphere(spawnPosition, enemyRadius, obstacleLayerMask).Length == 0)
+            if (IsPositionValid(position, settings.EnemyRadius))
             {
-                return spawnPosition;
+                return position;
             }
         }
-
-        Debug.LogWarning($"No valid position found for tile {tile.name} after {maxRetries} attempts.");
         return null;
+    }
+
+    private bool IsPositionValid(Vector3 position, float radius)
+    {
+        int obstacleLayer = 1 << LayerMask.NameToLayer("Obstacle");
+        return Physics.OverlapSphere(position, radius, obstacleLayer).Length == 0;
     }
 }

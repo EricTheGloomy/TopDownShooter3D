@@ -3,32 +3,31 @@ using UnityEngine.AI;
 
 public class EnemyController : MonoBehaviour
 {
-    [SerializeField] private NavMeshAgent agent;       // Reference to NavMeshAgent
-    [SerializeField] private Transform playerTransform; // Assigned by GameManager or other systems
-    [SerializeField] private EnemyControllerSettings settings; // ScriptableObject for settings
+    [SerializeField] private NavMeshAgent agent;
+    [SerializeField] private Transform playerTransform;
+    [SerializeField] private EnemyControllerSettings settings;
 
-    private float updateTimer = 0f; // Timer for throttling updates
+    private float updateTimer;
 
     void Start()
     {
         if (agent == null) agent = GetComponent<NavMeshAgent>();
-
         if (agent == null)
         {
-            Debug.LogError($"NavMeshAgent component is missing on {name}. EnemyController will not function.");
+            Debug.LogError($"NavMeshAgent missing on {name}.");
             return;
         }
 
         if (settings == null)
         {
-            Debug.LogWarning($"EnemyControllerSettings not assigned on {name}. Using fallback serialized values.");
+            Debug.LogWarning($"EnemyControllerSettings not assigned for {name}. Default values will be used.");
         }
 
         InitializeAgent();
 
         if (playerTransform == null)
         {
-            Debug.LogError("Player Transform is not assigned to EnemyController.");
+            Debug.LogWarning("Player Transform not assigned. Enemy cannot track the player.");
         }
     }
 
@@ -38,7 +37,7 @@ public class EnemyController : MonoBehaviour
 
         updateTimer += Time.deltaTime;
 
-        if (updateTimer >= settings.targetUpdateInterval)
+        if (updateTimer >= settings.TargetUpdateInterval)
         {
             updateTimer = 0f;
             UpdateAgentDestination();
@@ -50,29 +49,11 @@ public class EnemyController : MonoBehaviour
         playerTransform = player;
     }
 
-    public void SetObstaclePriority(int priority)
-    {
-        if (agent != null)
-        {
-            agent.avoidancePriority = priority;
-        }
-    }
-
     public void InitializeAgent()
     {
-        if (agent == null)
-        {
-            agent = GetComponent<NavMeshAgent>();
-            if (agent == null)
-            {
-                Debug.LogError($"NavMeshAgent component is missing on {name}. EnemyController will not function.");
-                return;
-            }
-        }
-        
-        agent.stoppingDistance = settings.stoppingDistance;
+        agent.stoppingDistance = settings.StoppingDistance;
         agent.autoRepath = true;
-        agent.acceleration = settings.acceleration;
+        agent.acceleration = settings.Acceleration;
 
         var enemy = GetComponent<Enemy>();
         if (enemy != null)
@@ -81,14 +62,14 @@ public class EnemyController : MonoBehaviour
         }
         else
         {
-            Debug.LogWarning($"Enemy component not found on {name}. Using default speed for NavMeshAgent.");
-            agent.speed = 3f;
+            Debug.LogWarning($"Enemy component not found on {name}. Using default speed.");
+            agent.speed = 3f; // Default fallback.
         }
     }
 
     private void UpdateAgentDestination()
     {
-        if (playerTransform != null && agent != null)
+        if (agent != null && playerTransform != null)
         {
             agent.SetDestination(playerTransform.position);
         }

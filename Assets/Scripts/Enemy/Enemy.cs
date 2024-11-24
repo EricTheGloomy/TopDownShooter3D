@@ -2,7 +2,8 @@ using UnityEngine;
 
 public class Enemy : MonoBehaviour
 {
-    [SerializeField] private EnemyConfig config; // Reference to ScriptableObject
+    [SerializeField] private EnemyConfig config;
+
     private int currentHealth;
     private float currentSpeed;
 
@@ -14,9 +15,13 @@ public class Enemy : MonoBehaviour
             return;
         }
 
-        // Initialize current values from config
-        currentHealth = config.health;
-        currentSpeed = config.movementSpeed;
+        InitializeStats();
+    }
+
+    private void InitializeStats()
+    {
+        currentHealth = config.Health;
+        currentSpeed = config.MovementSpeed;
     }
 
     public float GetCurrentSpeed()
@@ -26,15 +31,15 @@ public class Enemy : MonoBehaviour
 
     public void ModifySpeed(float multiplier)
     {
-        // Update currentSpeed based on multiplier
-        currentSpeed = config.movementSpeed * multiplier;
+        currentSpeed = config.MovementSpeed * multiplier;
     }
 
     public void TakeDamage(int damage)
     {
-        if (config == null) return; // Graceful handling for missing config
+        if (config == null) return;
 
         currentHealth -= damage;
+
         if (currentHealth <= 0)
         {
             Die();
@@ -45,17 +50,9 @@ public class Enemy : MonoBehaviour
     {
         Debug.Log($"{name} has been defeated!");
 
-        // Notify EnemyManager (graceful handling for missing manager)
-        var enemyManager = FindObjectOfType<EnemyManager>();
-        if (enemyManager == null)
-        {
-            Debug.LogError("EnemyManager not found. Cannot remove enemy.");
-        }
-        else
-        {
-            enemyManager.RemoveEnemy(gameObject);
-        }
+        // Notify manager indirectly; decoupled responsibility.
+        EnemyManager.Instance?.RemoveEnemy(gameObject);
 
-        Destroy(gameObject); // Destroy the enemy object
+        Destroy(gameObject);
     }
 }

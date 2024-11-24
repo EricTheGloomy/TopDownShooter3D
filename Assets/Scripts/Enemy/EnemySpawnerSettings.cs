@@ -4,11 +4,12 @@ using UnityEngine;
 public class EnemySpawnerSettings : ScriptableObject
 {
     [Header("Spawning Configuration")]
-    public int enemiesToSpawn = 10;
-    public float enemyRadius = 0.25f; // Size used for overlap check
-    public int maxRetries = 50; // Max attempts to find valid positions
+    public int EnemiesToSpawn = 10;        // Total number of enemies to spawn.
+    public float EnemyRadius = 0.25f;      // Radius used to ensure no overlap during spawn.
+    public int MaxRetries = 50;            // Maximum attempts to find valid spawn positions.
 
-    [Header("Obstacle Avoidance Priority")]
-    public int minObstaclePriority = 20;
-    public int maxObstaclePriority = 80;
+    [Header("Spawn Behavior")]
+    public int MinObstaclePriority = 20;   // Minimum priority for obstacle avoidance.
+    public int MaxObstaclePriority = 80;   // Maximum priority for obstacle avoidance.
+    public bool RandomizeSpawnOrder = true; // Whether to shuffle spawn order across tiles.
 }
