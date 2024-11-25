@@ -1,4 +1,3 @@
-// Scripts/Player/PlayerManager.cs
 using UnityEngine;
 
 public class PlayerManager : MonoBehaviour

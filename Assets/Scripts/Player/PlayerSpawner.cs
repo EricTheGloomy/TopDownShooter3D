@@ -1,10 +1,9 @@
-// Scripts/Player/PlayerSpawner.cs
 using System.Collections.Generic;
 using UnityEngine;
 
 public class PlayerSpawner : MonoBehaviour
 {
-    [SerializeField] private GameObject playerPrefab;
+    [SerializeField] private PlayerSpawnerSettings spawnerSettings; // Updated settings
     private Map map;
 
     public void Initialize(Map mapReference)
@@ -15,23 +14,29 @@ public class PlayerSpawner : MonoBehaviour
             return;
         }
 
+        if (spawnerSettings == null)
+        {
+            Debug.LogError("PlayerSpawnerSettings is not assigned!");
+            return;
+        }
+
+        if (spawnerSettings.playerPrefab == null)
+        {
+            Debug.LogError("Player prefab is not assigned in PlayerSpawnerSettings!");
+            return;
+        }
+
         map = mapReference;
         SpawnPlayer();
     }
 
     private void SpawnPlayer()
     {
-        if (playerPrefab == null)
-        {
-            Debug.LogError("PlayerPrefab is not assigned.");
-            return;
-        }
-
         Vector3? spawnPosition = FindValidSpawnPosition();
 
         if (spawnPosition.HasValue)
         {
-            GameObject player = Instantiate(playerPrefab, spawnPosition.Value, Quaternion.identity);
+            GameObject player = Instantiate(spawnerSettings.playerPrefab, spawnPosition.Value, Quaternion.identity);
             player.name = "Player";
 
             var playerManager = FindObjectOfType<PlayerManager>();
@@ -52,11 +57,10 @@ public class PlayerSpawner : MonoBehaviour
 
     private Vector3? FindValidSpawnPosition()
     {
-        int maxAttempts = 50; // Limit retries to avoid infinite loops
-        float playerRadius = 0.5f; // Radius for overlap check, adjust as needed
-        int obstacleLayerMask = 1 << LayerMask.NameToLayer("Obstacle");
+        int maxAttempts = spawnerSettings.maxRetries;
+        float playerRadius = spawnerSettings.spawnRadius;
+        int obstacleLayerMask = 1 << LayerMask.NameToLayer(spawnerSettings.obstacleLayerName);
 
-        // Get all tiles and shuffle them to ensure random order
         List<Tile> tiles = new List<Tile>(map.GetAllTiles());
         ShuffleTiles(tiles);
 
@@ -64,15 +68,13 @@ public class PlayerSpawner : MonoBehaviour
         {
             for (int attempt = 0; attempt < maxAttempts; attempt++)
             {
-                // Randomize a position on the tile
                 Vector3 tileCenter = tile.transform.position;
                 Vector3 tileSize = tile.TileSize;
 
                 float randomX = Random.Range(tileCenter.x - tileSize.x / 2, tileCenter.x + tileSize.x / 2);
                 float randomZ = Random.Range(tileCenter.z - tileSize.z / 2, tileCenter.z + tileSize.z / 2);
-                Vector3 spawnPosition = new Vector3(randomX, tileCenter.y + 1, randomZ); // Spawn slightly above the tile
+                Vector3 spawnPosition = new Vector3(randomX, tileCenter.y + 1, randomZ);
 
-                // Check if the position is free of obstacles
                 if (Physics.OverlapSphere(spawnPosition, playerRadius, obstacleLayerMask).Length == 0)
                 {
                     return spawnPosition;
@@ -80,11 +82,9 @@ public class PlayerSpawner : MonoBehaviour
             }
         }
 
-        // If no valid position is found, return null
         return null;
     }
 
-    // Utility method to shuffle the list of tiles
     private void ShuffleTiles(List<Tile> tiles)
     {
         for (int i = tiles.Count - 1; i > 0; i--)

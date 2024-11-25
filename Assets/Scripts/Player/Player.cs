@@ -1,4 +1,3 @@
-// Scripts/Player/Player.cs
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -7,16 +6,17 @@ public class Player : MonoBehaviour
 {
     [SerializeField] public PlayerConfig config; // ScriptableObject for player settings
 
-    public int Health { get; private set; }
+    public int CurrentHealth { get; private set; }
     public Tile CurrentTile { get; private set; }
 
-    private float currentSpeed;
+    private float movementSpeed;
 
     void Start()
     {
         if (config == null)
         {
             Debug.LogError("PlayerConfig is not assigned!");
+            enabled = false; // Disable script if config is missing
             return;
         }
 
@@ -25,8 +25,9 @@ public class Player : MonoBehaviour
 
     private void InitializePlayer()
     {
-        Health = config.startingHealth;
-        currentSpeed = config.moveSpeed;
+        CurrentHealth = config.startingHealth;
+        movementSpeed = config.moveSpeed;
+        Debug.Log($"Player initialized with {CurrentHealth}/{config.maxHealth} health.");
     }
 
     public void UpdateCurrentTile(Tile newTile)
@@ -36,9 +37,12 @@ public class Player : MonoBehaviour
 
     public void TakeDamage(int damage)
     {
-        Health -= damage;
+        if (damage < 0) return; // Prevent healing via negative damage
+        CurrentHealth -= damage;
 
-        if (Health <= 0)
+        Debug.Log($"{name} took {damage} damage. Health is now {CurrentHealth}/{config.maxHealth}.");
+
+        if (CurrentHealth <= 0)
         {
             Die();
         }
@@ -46,23 +50,24 @@ public class Player : MonoBehaviour
 
     public void Heal(int amount)
     {
-        Health = Mathf.Min(Health + amount, config.maxHealth);
+        if (amount < 0) return; // Prevent damage via negative healing
+        CurrentHealth = Mathf.Min(CurrentHealth + amount, config.maxHealth);
+        Debug.Log($"{name} healed {amount}. Health is now {CurrentHealth}/{config.maxHealth}.");
     }
 
-    public void ModifySpeed(float multiplier)
+    public void ModifyMovementSpeed(float multiplier)
     {
-        currentSpeed = config.moveSpeed * multiplier;
+        movementSpeed = config.moveSpeed * multiplier;
     }
 
-    public float GetCurrentSpeed()
+    public float GetMovementSpeed()
     {
-        return currentSpeed;
+        return movementSpeed;
     }
 
     private void Die()
     {
         Debug.Log($"{name} has died!");
-        // Notify the PlayerManager about the death (optional extension)
         FindObjectOfType<PlayerManager>()?.HandlePlayerDeath();
         Destroy(gameObject); // Remove the player instance
     }

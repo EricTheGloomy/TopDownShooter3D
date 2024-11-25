@@ -22,24 +22,32 @@ public class GameManager : MonoBehaviour
         InitializeGame();
     }
 
+    /// <summary>
+    /// Validates all serialized dependencies.
+    /// </summary>
+    /// <returns>True if all dependencies are assigned; otherwise, false.</returns>
     private bool ValidateDependencies()
     {
-        if (mapManager == null) Debug.LogError("MapManager is missing.");
-        if (obstacleSpawner == null) Debug.LogError("ObstacleSpawner is missing.");
-        if (playerSpawner == null) Debug.LogError("PlayerSpawner is missing.");
-        if (playerManager == null) Debug.LogError("PlayerManager is missing.");
-        if (cameraManager == null) Debug.LogError("CameraManager is missing.");
-        if (enemySpawner == null) Debug.LogError("EnemySpawner is missing.");
-        if (enemyManager == null) Debug.LogError("EnemyManager is missing.");
-        if (obstacleManager == null) Debug.LogError("ObstacleManager is missing.");
+        bool allValid = true;
 
-        // Return false if any dependency is null
-        return mapManager != null && obstacleSpawner != null &&
-               playerSpawner != null && playerManager != null &&
-               cameraManager != null && enemySpawner != null &&
-               enemyManager != null && obstacleManager != null;
+        foreach (var field in GetType().GetFields(System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance))
+        {
+            if (field.GetCustomAttributes(typeof(SerializeField), true).Length > 0)
+            {
+                if (field.GetValue(this) == null)
+                {
+                    Debug.LogError($"{field.Name} is missing in {GetType().Name}.");
+                    allValid = false;
+                }
+            }
+        }
+
+        return allValid;
     }
 
+    /// <summary>
+    /// Initializes the game by setting up all managers and spawners.
+    /// </summary>
     private void InitializeGame()
     {
         Debug.Log("Initializing Game...");
@@ -48,17 +56,19 @@ public class GameManager : MonoBehaviour
         obstacleSpawner.Initialize(mapManager.GetMap());
         playerSpawner.Initialize(mapManager.GetMap());
 
-        if (playerManager.Player != null)
+        var player = playerManager.Player;
+        if (player != null)
         {
-            cameraManager.SetPlayer(playerManager.Player.transform);
-            enemyManager.SetPlayerTransform(playerManager.Player.transform);
+            cameraManager.SetPlayer(player.transform);
+            enemyManager.SetPlayerTransform(player.transform);
         }
         else
         {
             Debug.LogError("PlayerManager.Player is null during GameManager initialization.");
+            return;
         }
 
-        enemySpawner.Initialize(mapManager.GetMap(), playerManager.Player.transform);
+        enemySpawner.Initialize(mapManager.GetMap(), player.transform);
 
         Debug.Log("Game Initialized!");
     }

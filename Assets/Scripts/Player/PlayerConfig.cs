@@ -10,4 +10,7 @@ public class PlayerConfig : ScriptableObject
     [Header("Movement")]
     public float moveSpeed = 5f;
     public float rotationSpeed = 180f;
+
+    [Header("Other Attributes")]
+    public float stamina = 100f; // Placeholder for stamina or future attributes
 }
