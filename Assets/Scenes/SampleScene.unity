@@ -814,7 +814,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8e758de164d6f9d46bf3326e51b0eb33, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerPrefab: {fileID: 2982092236117363582, guid: 436714a701728e643b7db43c4909df42, type: 3}
+  spawnerSettings: {fileID: 11400000, guid: fdc35d804a8cc5e4abc3d895946cb983, type: 2}
 --- !u!4 &1930382854
 Transform:
   m_ObjectHideFlags: 0
@@ -1046,7 +1046,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bd6f5b136c43beb438cd0059544a0939, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  obstaclePrefab: {fileID: 8361594299122610591, guid: c22ef0afbcc047445904ae47420909be, type: 3}
   config: {fileID: 11400000, guid: e7e2aa4836dcfea4a948c9b95396e915, type: 2}
 --- !u!4 &2145653937
 Transform:
