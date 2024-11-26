@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8101285beb093b949a86f65454f4219d, type: 3}
   m_Name: EnemySpawnerSettings
   m_EditorClassIdentifier: 
-  EnemiesToSpawn: 1
+  EnemiesToSpawn: 0
   EnemyRadius: 0.25
   MaxRetries: 50
   MinObstaclePriority: 30

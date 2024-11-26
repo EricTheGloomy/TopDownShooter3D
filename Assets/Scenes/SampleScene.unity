@@ -619,6 +619,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   enemyPrefabs:
   - {fileID: 8834230414387790470, guid: 9d2edc4bcd2438e45bd30c475cc42e9c, type: 3}
+  spawnConfig: {fileID: 11400000, guid: 6c015b90a077fd549bfbb089eb14f380, type: 2}
   settings: {fileID: 11400000, guid: f49f093eed452f441a78bcbab496b268, type: 2}
 --- !u!4 &1318653901
 Transform:
@@ -1046,7 +1047,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bd6f5b136c43beb438cd0059544a0939, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  config: {fileID: 11400000, guid: e7e2aa4836dcfea4a948c9b95396e915, type: 2}
+  obstacleConfig: {fileID: 11400000, guid: e7e2aa4836dcfea4a948c9b95396e915, type: 2}
+  spawnConfig: {fileID: 11400000, guid: 3a2467665b2a7d24da83d70491cd173d, type: 2}
 --- !u!4 &2145653937
 Transform:
   m_ObjectHideFlags: 0
