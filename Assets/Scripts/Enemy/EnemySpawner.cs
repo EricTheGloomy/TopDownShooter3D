@@ -168,4 +168,49 @@ public class EnemySpawner : MonoBehaviour
             tiles[randomIndex] = temp;
         }
     }
+
+    public void SpawnEnemyOnTile(Tile tile, GameObject enemyPrefab)
+    {
+        Vector3? validPosition = FindValidPositionOnTile(tile);
+
+        if (validPosition.HasValue)
+        {
+            GameObject enemy = Instantiate(enemyPrefab, validPosition.Value, Quaternion.identity, enemyManager.transform);
+            InitializeEnemy(enemy);
+            enemyManager.AddEnemy(enemy);
+        }
+        else
+        {
+            Debug.LogWarning($"Failed to find valid position for enemy on tile {tile.name}");
+        }
+    }
+
+    public List<Tile> GetAvailableTiles()
+    {
+        if (map == null)
+        {
+            Debug.LogError("Map reference is null in EnemySpawner.");
+            return new List<Tile>();
+        }
+
+        List<Tile> tiles = new List<Tile>(map.GetAllTiles());
+
+        // Exclude the tile occupied by the player
+        if (playerTransform != null)
+        {
+            Tile playerTile = map.GetTileAtPosition(playerTransform.position);
+            if (playerTile != null)
+            {
+                tiles.Remove(playerTile);
+            }
+        }
+
+        return tiles;
+    }
+    
+    public Map GetMap()
+    {
+        return map;
+    }
+
 }

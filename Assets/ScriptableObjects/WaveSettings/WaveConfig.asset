@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 45233d26d6ab79e4daffbc9857808ec2, type: 3}
+  m_Name: WaveConfig
+  m_EditorClassIdentifier: 
+  WaveDelay: 30
+  SpawnDelay: 0.5
+  Patterns:
+  - PatternName: 1
+    Percentage: 0
+    EnemiesToSpawn:
+    - {fileID: 8834230414387790470, guid: 5c966235e18c9c643b9ccf1a1f3322d7, type: 3}
+    EnemyCounts: 0a000000
+  NumberOfEnemies: 10

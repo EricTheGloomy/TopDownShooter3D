@@ -9,7 +9,8 @@ public class GameManager : MonoBehaviour
     [SerializeField] private CameraManager cameraManager;
     [SerializeField] private EnemySpawner enemySpawner;
     [SerializeField] private EnemyManager enemyManager;
-    [SerializeField] private ObstacleManager obstacleManager; // Serialized for explicit assignment
+    [SerializeField] private ObstacleManager obstacleManager;
+    [SerializeField] private WaveManager waveManager;
 
     private void Start()
     {
@@ -22,10 +23,6 @@ public class GameManager : MonoBehaviour
         InitializeGame();
     }
 
-    /// <summary>
-    /// Validates all serialized dependencies.
-    /// </summary>
-    /// <returns>True if all dependencies are assigned; otherwise, false.</returns>
     private bool ValidateDependencies()
     {
         bool allValid = true;
@@ -45,9 +42,6 @@ public class GameManager : MonoBehaviour
         return allValid;
     }
 
-    /// <summary>
-    /// Initializes the game by setting up all managers and spawners.
-    /// </summary>
     private void InitializeGame()
     {
         Debug.Log("Initializing Game...");
@@ -69,6 +63,17 @@ public class GameManager : MonoBehaviour
         }
 
         enemySpawner.Initialize(mapManager.GetMap(), player.transform);
+
+        // Initialize the WaveManager after all dependencies are set up
+        if (waveManager != null)
+        {
+            Debug.Log("Initializing WaveManager...");
+            waveManager.enabled = true; // Ensure it's enabled before starting waves
+        }
+        else
+        {
+            Debug.LogError("WaveManager is missing in GameManager.");
+        }
 
         Debug.Log("Game Initialized!");
     }
