@@ -1,8 +1,10 @@
+// Scripts/Player/PlayerManager.cs
 using UnityEngine;
 
 public class PlayerManager : MonoBehaviour
 {
     public GameObject Player { get; private set; }
+    private WeaponManager weaponManager;
 
     public void SetPlayer(GameObject player)
     {
@@ -13,12 +15,20 @@ public class PlayerManager : MonoBehaviour
         }
 
         Player = player;
-        Debug.Log("Player has been set in PlayerManager.");
+
+        weaponManager = Player.GetComponent<WeaponManager>();
+        if (weaponManager != null)
+        {
+            weaponManager.InitializeWeapons();
+        }
+        else
+        {
+            Debug.LogError("WeaponManager not found on Player.");
+        }
     }
 
     public void HandlePlayerDeath()
     {
         Debug.Log("Player has died! Handle game-over or respawn logic here.");
-        // Add game-over screen, respawn logic, etc.
     }
 }

@@ -1,3 +1,4 @@
+// Scripts/Game/GameManager.cs
 using UnityEngine;
 
 public class GameManager : MonoBehaviour
@@ -55,6 +56,16 @@ public class GameManager : MonoBehaviour
         {
             cameraManager.SetPlayer(player.transform);
             enemyManager.SetPlayerTransform(player.transform);
+
+            var weaponManager = player.GetComponent<WeaponManager>();
+            if (weaponManager != null)
+            {
+                weaponManager.InitializeWeapons();
+            }
+            else
+            {
+                Debug.LogError("WeaponManager is missing on Player.");
+            }
         }
         else
         {
@@ -64,11 +75,9 @@ public class GameManager : MonoBehaviour
 
         enemySpawner.Initialize(mapManager.GetMap(), player.transform);
 
-        // Initialize the WaveManager after all dependencies are set up
         if (waveManager != null)
         {
-            Debug.Log("Initializing WaveManager...");
-            waveManager.enabled = true; // Ensure it's enabled before starting waves
+            waveManager.enabled = true;
         }
         else
         {
