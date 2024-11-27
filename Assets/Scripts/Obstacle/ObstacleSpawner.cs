@@ -1,4 +1,3 @@
-// Scripts/Obstacle/ObstacleSpawner.cs
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -87,7 +86,7 @@ public class ObstacleSpawner : MonoBehaviour
         {
             for (int count = 0; count < pattern.ObstacleCounts[i]; count++)
             {
-                Vector3? validPosition = FindValidPositionOnTile(tile);
+                Vector3? validPosition = FindValidPositionOnTile(tile, pattern.ObstaclesToSpawn[i]);
 
                 if (validPosition.HasValue)
                 {
@@ -135,20 +134,19 @@ public class ObstacleSpawner : MonoBehaviour
     private void AdjustTransformForTile(Transform obstacleTransform, Transform tileTransform)
     {
         obstacleTransform.SetParent(tileTransform, true);
-        //Not needed anymore ??? 
-        //Vector3 localScale = obstacleConfig.DefaultObstaclePrefab.transform.localScale;
-        //localScale.x /= tileTransform.localScale.x;
-        //localScale.y /= tileTransform.localScale.y;
-        //localScale.z /= tileTransform.localScale.z;
-        //obstacleTransform.localScale = localScale;
     }
 
-    private Vector3? FindValidPositionOnTile(Tile tile)
+    private Vector3? FindValidPositionOnTile(Tile tile, GameObject obstaclePrefab)
     {
+        Collider obstacleCollider = obstaclePrefab.GetComponent<Collider>();
+        float radius = obstacleCollider != null
+            ? Mathf.Max(obstacleCollider.bounds.extents.x, obstacleCollider.bounds.extents.z)
+            : obstacleConfig.DefaultObstacleRadius;
+
         for (int attempt = 0; attempt < obstacleConfig.MaxRetries; attempt++)
         {
-            Vector3 position = tile.GetRandomPosition(obstacleConfig.DefaultObstacleRadius);
-            if (IsPositionValid(position, obstacleConfig.DefaultObstacleRadius))
+            Vector3 position = tile.GetRandomPosition(radius);
+            if (IsPositionValid(position, radius))
             {
                 return position;
             }
@@ -158,8 +156,9 @@ public class ObstacleSpawner : MonoBehaviour
 
     private bool IsPositionValid(Vector3 position, float radius)
     {
+        float buffer = 0.1f; // Add a small margin to avoid edge collisions
         int obstacleLayer = 1 << LayerMask.NameToLayer(obstacleConfig.ObstacleLayer);
-        return Physics.OverlapSphere(position, radius, obstacleLayer).Length == 0;
+        return Physics.OverlapSphere(position, radius + buffer, obstacleLayer).Length == 0;
     }
 
     private void ShuffleTiles(List<Tile> tiles)

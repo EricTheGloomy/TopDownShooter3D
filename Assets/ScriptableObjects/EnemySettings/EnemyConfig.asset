@@ -13,6 +13,6 @@ MonoBehaviour:
   m_Name: EnemyConfig
   m_EditorClassIdentifier: 
   Health: 50
-  MovementSpeed: 3
+  MovementSpeed: 2.5
   Aggressive: 1
   DetectionRange: 10
